@@ -1,23 +1,31 @@
+width = 640
+height = 640
+
 def updateWithData(data):
     data = data.split('#')
-    print(data)
+    print('data', data)
     weather = data[0].split('|')
+    print('weather', weather)
     wsymbol = weather[0]
+    print('wsymbol', wsymbol)
     temp = int(weather[1])
+    print('temp', temp)
     #$('#weather').css('background-image', 'url(/img/weather/' + wsymbol + '.png)').html('' + temp + '<small>°C</small>')
     mgmts = data[1].split('$')
+    print('mgmts', mgmts)
     html = ''
     for i in mgmts:
-        if not mgmts[i]:
+        if i == '':
             continue
-        mgmt = mgmts[i].split('|')
+        mgmt = i.split('|')
+        print('mgmt', mgmt)
         html += '<div class="round">'
         html += f'<img class="round pointer" onclick="lol.go(\'/arm/org/{mgmt[0]}\')"'
         html += f' src="/img/herald/{mgmt[1]}.st.jpg" title="{mgmt[2]}">'
-        mgmtFin = int(mgmt[3])
-        mgmtUnit = int(mgmt[4])
-        mgmtBuild = int(mgmt[5])
-        mgmtTrade = int(mgmt[6])
+        mgmtFin = int(mgmt[3] or 0)
+        mgmtUnit = int(mgmt[4] or 0)
+        mgmtBuild = int(mgmt[5] or 0)
+        mgmtTrade = int(mgmt[6] or 0)
         html += ' <div class="mgmtbtns">'
         if mgmtFin:
             html += '<a class="blur" href="/mgmt/' + mgmt[0] + '/finances"><img class="round" src="/img/button/fin.png"></a> '
@@ -76,35 +84,39 @@ def updateWithData(data):
     tiles = data[3].split('$')
     #div.children('.tile.new').remove()
     #div.children('.tile').addClass('deprecated')
-    #var tileWidth = 100.0 * zoom * 16 / lol.Map.width
-    #var tileHeight = 100.0 * zoom * 16 / lol.Map.height
+    tileWidth = 100.0 * zoom * 16 / width
+    tileHeight = 100.0 * zoom * 16 / height
+    print('tiles', tiles)
     for i in tiles:
-        if not tiles[i]:
+        if i == "":
             continue
-        tile = tiles[i].split('|')
+        tile = i.split('|')
+        print('tile', tile)
         ttag = tile[0]
         tx = int(tile[1])
         ty = int(tile[2])
         version = int(tile[3])
         released = int(tile[4])
-        key = 'tile:' + tx + ':' + ty + ':' + zoom + ':' + version
-        left = 100.0 * (tx * 16 + lol.Map.width / 2) / lol.Map.width
-        top = 100.0 * (ty * 16 + lol.Map.height / 2) / lol.Map.height
-        style = 'left:' + left + '%top:' + top + '%width:' + tileWidth + '%height:' + tileHeight + '%'
-        if anim:
-            style += 'display:none'
-        src = '/img/tile/' + ttag + '.' + zoom + '.' + version + ('' if released else '.unreleased') + '.jpg'
+        key = f'tile:{tx}:{ty}:{zoom}:{version}'
+        left = 100.0 * (tx * 16 + width / 2) / width
+        top = 100.0 * (ty * 16 + height / 2) / height
+        style = f'left:{left}%top:{top}%width:{tileWidth}%height:{tileHeight}%'
+        #if anim:
+        #    style += 'display:none'
+        src = f'/img/tile/{ttag}.{zoom}.{version}{("" if released else ".unreleased")}.jpg'
         html = '<img class="tile new" style="' + style + '" src="' + src + '" data-key="' + key + '"/>'
-        div.append(html)
-        tcoords['' + tx + ':' + ty] = true
+        #div.append(html)
+        tcoords[f'{tx}:{ty}'] = True
     
     for tx in range(tx0, tx0+tw, zoom):             # (tx = tx0 tx < tx0 + tw tx += zoom)
         for ty in range(ty0, ty0+th, zoom):         # (ty = ty0 ty < ty0 + th ty += zoom)
-            if tcoords['' + tx + ':' + ty]):
+            #print(tcoords)
+            print(tcoords)
+            if tcoords[f'{tx}:{ty}']:
                 continue
             key = 'tile:' + tx + ':' + ty + ':' + zoom + ':0'
-            left = 100.0 * (tx * 16 + lol.Map.width / 2) / lol.Map.width
-            top = 100.0 * (ty * 16 + lol.Map.height / 2) / lol.Map.height
+            left = 100.0 * (tx * 16 + width / 2) / width
+            top = 100.0 * (ty * 16 + height / 2) / height
             style = 'left:' + left + '%top:' + top + '%width:' + tileWidth + '%height:' + tileHeight + '%'
             if anim:
                 style += 'display:none'
@@ -123,8 +135,8 @@ def updateWithData(data):
         crest = org[2]
         name = org[3]
         blazon = org[4]
-        left = 100.0 * (x + lol.Map.width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
-        top = 100.0 * (y + lol.Map.height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
+        left = 100.0 * (x + width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
+        top = 100.0 * (y + height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
         style = 'left:' + left + '%top:' + top + '%'
         html = '<div class="label" style="' + style + '">'
         if crest.length:
@@ -144,8 +156,8 @@ def updateWithData(data):
         x = int(units[0])
         y = int(units[1])
         n = Math.min(int(units[2]), 9)
-        left = 100.0 * (x - 0.25 + lol.Map.width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
-        top = 100.0 * (y - 0.25 + lol.Map.height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
+        left = 100.0 * (x - 0.25 + width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
+        top = 100.0 * (y - 0.25 + height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
         style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
         html = '<img class="units noMouse" style="' + style + '" src="/img/map/units' + n + '.gif"/>'
         div.append(html)
@@ -160,8 +172,8 @@ def updateWithData(data):
         y = int(route[1])
         type = route[2]
         title = __('route.' + type)
-        left = 100.0 * (x - 0.25 + lol.Map.width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
-        top = 100.0 * (y - 0.25 + lol.Map.height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
+        left = 100.0 * (x - 0.25 + width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
+        top = 100.0 * (y - 0.25 + height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
         style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
         html = '<img class="route" style="' + style + '" src="/img/map/route.png" title="' + title + '"/>'
         div.append(html)
@@ -176,26 +188,27 @@ def updateWithData(data):
         y = int(action[1])
         type = action[2]
         title = __('act.' + type)
-        left = 100.0 * (x - 0.25 + lol.Map.width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
-        top = 100.0 * (y - 0.25 + lol.Map.height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
+        left = 100.0 * (x - 0.25 + width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
+        top = 100.0 * (y - 0.25 + height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
         style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
         html = '<img class="act" style="' + style + '" src="/img/map/act/' + type + '.gif" title="' + title + '"/>'
         div.append(html)
 
     if anim:
-        div.children('img.new').load(function() {
-            $(this).fadeIn(400, function() {
-                if ($(this).is('.deprecated')) return
-                var key = $(this).attr('data-key')
-                div.children('.deprecated[data-key="' + key + '"]').remove()
-            })
-        })
+        pass
+        #div.children('img.new').load(function() {
+        #    $(this).fadeIn(400, function() {
+        #        if ($(this).is('.deprecated')) return
+        #        var key = $(this).attr('data-key')
+        #        div.children('.deprecated[data-key="' + key + '"]').remove()
+        #    })
+        #})
 
     div.children('img.new').removeClass('new')
     clearTimeout(lol.Map.deprecatedTimeout)
-    lol.Map.deprecatedTimeout = setTimeout(function() {
-        div.children('.deprecated').remove()
-    }, 30000)
+    #lol.Map.deprecatedTimeout = setTimeout(function() {
+    #    div.children('.deprecated').remove()
+    #}, 30000)
 
 
 if __name__ == "__main__":
