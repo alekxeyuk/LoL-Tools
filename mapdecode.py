@@ -48,35 +48,12 @@ def updateWithData(data):
     #$('#mapMgmt').html(html)
     n = 0
     info = data[2].split('|')
-    x = int(info[++n])
-    y = int(info[++n])
-    w = int(info[++n])
-    h = int(info[++n])
-    zoom = int(info[++n])
-    mode = info[++n]
-    tx0 = int(info[++n])
-    ty0 = int(info[++n])
-    tw = int(info[++n])
-    th = int(info[++n])
-    mtx0 = tx0 - tw
-    mty0 = ty0 - th
-    mtw = tw * 3
-    mth = th * 3
-    info = {
-        x: x,
-        y: y,
-        w: w,
-        h: h,
-        zoom: zoom,
-        tx0: tx0,
-        ty0: ty0,
-        tw: tw,
-        th: th,
-        mtx0: mtx0,
-        mty0: mty0,
-        mtw: mtw,
-        mth: mth
-    }
+    print('info', info)
+    keys = ['x', 'y', 'w', 'h', 'zoom', 'mode', 'tx0', 'ty0', 'tw', 'th']
+    info = {keys[i]:info[i] for i in range(len(keys))}
+    info.update({'mtx0': int(info['tx0']) - int(info['tw']), 'mty0': int(info['ty0']) - int(info['th']), 'mtw': int(info['tw']) * 3, 'mth': int(info['th']) * 3})
+    print('info DICT', info)
+    #exit()
     #var div = $('#map .map')
     #var divWidth = div.width()
     #var divHeight = div.height()
