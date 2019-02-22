@@ -1,5 +1,6 @@
 def updateWithData(data):
     data = data.split('#')
+    print(data)
     weather = data[0].split('|')
     wsymbol = weather[0]
     temp = int(weather[1])
@@ -39,16 +40,16 @@ def updateWithData(data):
     #$('#mapMgmt').html(html)
     n = 0
     info = data[2].split('|')
-    x = int(info[n++])
-    y = int(info[n++])
-    w = int(info[n++])
-    h = int(info[n++])
-    zoom = int(info[n++])
-    mode = info[n++]
-    tx0 = int(info[n++])
-    ty0 = int(info[n++])
-    tw = int(info[n++])
-    th = int(info[n++])
+    x = int(info[++n])
+    y = int(info[++n])
+    w = int(info[++n])
+    h = int(info[++n])
+    zoom = int(info[++n])
+    mode = info[++n]
+    tx0 = int(info[++n])
+    ty0 = int(info[++n])
+    tw = int(info[++n])
+    th = int(info[++n])
     mtx0 = tx0 - tw
     mty0 = ty0 - th
     mtw = tw * 3
@@ -92,89 +93,96 @@ def updateWithData(data):
         style = 'left:' + left + '%top:' + top + '%width:' + tileWidth + '%height:' + tileHeight + '%'
         if anim:
             style += 'display:none'
-        src = '/img/tile/' + ttag + '.' + zoom + '.' + version + (released ? '' : '.unreleased') + '.jpg'
+        src = '/img/tile/' + ttag + '.' + zoom + '.' + version + ('' if released else '.unreleased') + '.jpg'
         html = '<img class="tile new" style="' + style + '" src="' + src + '" data-key="' + key + '"/>'
         div.append(html)
         tcoords['' + tx + ':' + ty] = true
     
-    for (var tx = tx0 tx < tx0 + tw tx += zoom)
-        for (var ty = ty0 ty < ty0 + th ty += zoom) {
-            if (tcoords['' + tx + ':' + ty]) continue
-            var key = 'tile:' + tx + ':' + ty + ':' + zoom + ':0'
-            var left = 100.0 * (tx * 16 + lol.Map.width / 2) / lol.Map.width
-            var top = 100.0 * (ty * 16 + lol.Map.height / 2) / lol.Map.height
-            var style = 'left:' + left + '%top:' + top + '%width:' + tileWidth + '%height:' + tileHeight + '%'
-            if (anim) style += 'display:none'
-            var src = '/img/tile/' + Math.abs((tx / zoom) % 2) + Math.abs((ty / zoom) % 2) + '.' + zoom + '.0.jpg'
-            var html = '<img class="tile new" style="' + style + '" src="' + src + '" data-key="' + key + '"/>'
+    for tx in range(tx0, tx0+tw, zoom):             # (tx = tx0 tx < tx0 + tw tx += zoom)
+        for ty in range(ty0, ty0+th, zoom):         # (ty = ty0 ty < ty0 + th ty += zoom)
+            if tcoords['' + tx + ':' + ty]):
+                continue
+            key = 'tile:' + tx + ':' + ty + ':' + zoom + ':0'
+            left = 100.0 * (tx * 16 + lol.Map.width / 2) / lol.Map.width
+            top = 100.0 * (ty * 16 + lol.Map.height / 2) / lol.Map.height
+            style = 'left:' + left + '%top:' + top + '%width:' + tileWidth + '%height:' + tileHeight + '%'
+            if anim:
+                style += 'display:none'
+            src = '/img/tile/' + Math.abs((tx / zoom) % 2) + Math.abs((ty / zoom) % 2) + '.' + zoom + '.0.jpg'
+            html = '<img class="tile new" style="' + style + '" src="' + src + '" data-key="' + key + '"/>'
             div.append(html)
-        }
-    var orgs = data[4].split('$')
-    div.children('.label').remove()
-    for (var i in orgs) {
-        if (!orgs[i]) continue
-        var org = orgs[i].split('|')
-        var x = int(org[0])
-        var y = int(org[1])
-        var crest = org[2]
-        var name = org[3]
-        var blazon = org[4]
-        var left = 100.0 * (x + lol.Map.width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
-        var top = 100.0 * (y + lol.Map.height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
-        var style = 'left:' + left + '%top:' + top + '%'
-        var html = '<div class="label" style="' + style + '">'
-        if (crest.length) html += '<img class="crest" src="/img/crest/' + crest + '.sh.png"/>'
+
+    orgs = data[4].split('$')
+    #div.children('.label').remove()
+    for i in orgs:
+        if not orgs[i]:
+            continue
+        org = orgs[i].split('|')
+        x = int(org[0])
+        y = int(org[1])
+        crest = org[2]
+        name = org[3]
+        blazon = org[4]
+        left = 100.0 * (x + lol.Map.width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
+        top = 100.0 * (y + lol.Map.height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
+        style = 'left:' + left + '%top:' + top + '%'
+        html = '<div class="label" style="' + style + '">'
+        if crest.length:
+            html += '<img class="crest" src="/img/crest/' + crest + '.sh.png"/>'
         html += '<img class="blz" src="/img/herald/' + blazon + '.sh.png"/>'
         html += '<p class="old uppercase round txt ellipsis">' + name + '</p></div>'
         div.append(html)
-    }
-    var cellWidth = 100.0 * lol.Map.cellWidth / divWidth * zoom / lol.Map.zoom
-    var cellHeight = 100.0 * lol.Map.cellWidth / divHeight * zoom / lol.Map.zoom
-    var unitGroups = data[5].split('$')
-    div.children('.units').remove()
-    for (var i in unitGroups) {
-        if (!unitGroups[i]) continue
-        var units = unitGroups[i].split('|')
-        var x = int(units[0])
-        var y = int(units[1])
-        var n = Math.min(int(units[2]), 9)
-        var left = 100.0 * (x - 0.25 + lol.Map.width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
-        var top = 100.0 * (y - 0.25 + lol.Map.height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
-        var style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
-        var html = '<img class="units noMouse" style="' + style + '" src="/img/map/units' + n + '.gif"/>'
+
+    cellWidth = 100.0 * lol.Map.cellWidth / divWidth * zoom / lol.Map.zoom
+    cellHeight = 100.0 * lol.Map.cellWidth / divHeight * zoom / lol.Map.zoom
+    unitGroups = data[5].split('$')
+    #div.children('.units').remove()
+    for i in unitGroups:
+        if not unitGroups[i]:
+            continue
+        units = unitGroups[i].split('|')
+        x = int(units[0])
+        y = int(units[1])
+        n = Math.min(int(units[2]), 9)
+        left = 100.0 * (x - 0.25 + lol.Map.width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
+        top = 100.0 * (y - 0.25 + lol.Map.height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
+        style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
+        html = '<img class="units noMouse" style="' + style + '" src="/img/map/units' + n + '.gif"/>'
         div.append(html)
-    }
-    var routes = data[6].split('$')
-    div.children('.route').remove()
-    for (var i in routes) {
-        if (!routes[i]) continue
-        var route = routes[i].split('|')
-        var x = int(route[0])
-        var y = int(route[1])
-        var type = route[2]
-        var title = __('route.' + type)
-        var left = 100.0 * (x - 0.25 + lol.Map.width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
-        var top = 100.0 * (y - 0.25 + lol.Map.height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
-        var style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
-        var html = '<img class="route" style="' + style + '" src="/img/map/route.png" title="' + title + '"/>'
+
+    routes = data[6].split('$')
+    #div.children('.route').remove()
+    for i in routes:
+        if not routes[i]:
+            continue
+        route = routes[i].split('|')
+        x = int(route[0])
+        y = int(route[1])
+        type = route[2]
+        title = __('route.' + type)
+        left = 100.0 * (x - 0.25 + lol.Map.width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
+        top = 100.0 * (y - 0.25 + lol.Map.height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
+        style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
+        html = '<img class="route" style="' + style + '" src="/img/map/route.png" title="' + title + '"/>'
         div.append(html)
-    }
-    var actions = data[7].split('$')
-    div.children('.act').remove()
-    for (var i in actions) {
-        if (!actions[i]) continue
-        var action = actions[i].split('|')
-        var x = int(action[0])
-        var y = int(action[1])
-        var type = action[2]
-        var title = __('act.' + type)
-        var left = 100.0 * (x - 0.25 + lol.Map.width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
-        var top = 100.0 * (y - 0.25 + lol.Map.height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
-        var style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
-        var html = '<img class="act" style="' + style + '" src="/img/map/act/' + type + '.gif" title="' + title + '"/>'
+
+    actions = data[7].split('$')
+    #div.children('.act').remove()
+    for i in actions:
+        if not actions[i]:
+            continue
+        action = actions[i].split('|')
+        x = int(action[0])
+        y = int(action[1])
+        type = action[2]
+        title = __('act.' + type)
+        left = 100.0 * (x - 0.25 + lol.Map.width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
+        top = 100.0 * (y - 0.25 + lol.Map.height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
+        style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
+        html = '<img class="act" style="' + style + '" src="/img/map/act/' + type + '.gif" title="' + title + '"/>'
         div.append(html)
-    }
-    if (anim) {
+
+    if anim:
         div.children('img.new').load(function() {
             $(this).fadeIn(400, function() {
                 if ($(this).is('.deprecated')) return
@@ -182,7 +190,7 @@ def updateWithData(data):
                 div.children('.deprecated[data-key="' + key + '"]').remove()
             })
         })
-    }
+
     div.children('img.new').removeClass('new')
     clearTimeout(lol.Map.deprecatedTimeout)
     lol.Map.deprecatedTimeout = setTimeout(function() {
