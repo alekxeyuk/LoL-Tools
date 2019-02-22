@@ -21,7 +21,7 @@ class B64:
         return result
 
     def encode(self, data, url = None):
-        result = str(base64.b64encode(bytes(data.encode("utf-8"))))[2:-1]
+        result = str(base64.b64encode(bytes(data.encode("ISO-8859-1"))))[2:-1]
         if url:
             result = result.replace('+', '-')
             result = result.replace('/', '~')
