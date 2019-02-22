@@ -1,5 +1,20 @@
-width = 640
-height = 640
+import math
+
+width = 100
+height = 100
+
+def pad0(n, length):
+    line = '' + str(n)
+    while len(line) < length:
+        line = '0' + line
+    return line
+
+
+def coordsToString(x, y, sep = None):
+    x = math.floor(x)
+    y = math.floor(y)
+    return pad0(-x if x < 0 else x + 1, 5) + ('W' if x < 0 else 'E') + (':' if sep else '') + pad0(-y if y < 0 else y + 1, 5) + ('N' if y < 0 else 'S')
+
 
 def updateWithData(data):
     data = data.split('#')
@@ -53,16 +68,14 @@ def updateWithData(data):
     info = {keys[i]:info[i] for i in range(len(keys))}
     info.update({'mtx0': int(info['tx0']) - int(info['tw']), 'mty0': int(info['ty0']) - int(info['th']), 'mtw': int(info['tw']) * 3, 'mth': int(info['th']) * 3})
     print('info DICT', info)
-    #exit()
-    #var div = $('#map .map')
-    #var divWidth = div.width()
-    #var divHeight = div.height()
+
+    divWidth, divHeight, cellWidth = (3200000, 3200000, 40)
     tcoords = {}
     tiles = data[3].split('$')
     #div.children('.tile.new').remove()
     #div.children('.tile').addClass('deprecated')
-    tileWidth = 100.0 * zoom * 16 / width
-    tileHeight = 100.0 * zoom * 16 / height
+    tileWidth = 100 * int(info['zoom']) * 16 / width
+    tileHeight = 100 * int(info['zoom']) * 16 / height
     print('tiles', tiles)
     for i in tiles:
         if i == "":
@@ -74,21 +87,22 @@ def updateWithData(data):
         ty = int(tile[2])
         version = int(tile[3])
         released = int(tile[4])
-        key = f'tile:{tx}:{ty}:{zoom}:{version}'
+        key = f'tile:{tx}:{ty}:{info["zoom"]}:{version}'
         left = 100.0 * (tx * 16 + width / 2) / width
         top = 100.0 * (ty * 16 + height / 2) / height
+        print(left, top, coordsToString(left, top))
         style = f'left:{left}%top:{top}%width:{tileWidth}%height:{tileHeight}%'
         #if anim:
         #    style += 'display:none'
-        src = f'/img/tile/{ttag}.{zoom}.{version}{("" if released else ".unreleased")}.jpg'
+        src = f'/img/tile/{ttag}.{info["zoom"]}.{version}{("" if released else ".unreleased")}.jpg'
         html = '<img class="tile new" style="' + style + '" src="' + src + '" data-key="' + key + '"/>'
         #div.append(html)
         tcoords[f'{tx}:{ty}'] = True
     
-    for tx in range(tx0, tx0+tw, zoom):             # (tx = tx0 tx < tx0 + tw tx += zoom)
-        for ty in range(ty0, ty0+th, zoom):         # (ty = ty0 ty < ty0 + th ty += zoom)
+    print('tcoords', tcoords)
+    for tx in range(int(info['tx0']), int(info['tx0']) + int(info['tw']), int(info["zoom"])):             # (tx = tx0 tx < tx0 + tw tx += zoom)
+        for ty in range(int(info['ty0']), int(info['ty0']) + int(info['th']), int(info['zoom'])):         # (ty = ty0 ty < ty0 + th ty += zoom)
             #print(tcoords)
-            print(tcoords)
             if tcoords[f'{tx}:{ty}']:
                 continue
             key = 'tile:' + tx + ':' + ty + ':' + zoom + ':0'
@@ -102,9 +116,9 @@ def updateWithData(data):
             div.append(html)
 
     orgs = data[4].split('$')
-    #div.children('.label').remove()
+    print('orgs', orgs)
     for i in orgs:
-        if not orgs[i]:
+        if i == "":
             continue
         org = orgs[i].split('|')
         x = int(org[0])
@@ -112,8 +126,8 @@ def updateWithData(data):
         crest = org[2]
         name = org[3]
         blazon = org[4]
-        left = 100.0 * (x + width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
-        top = 100.0 * (y + height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
+        left = 100.0 * (x + width / 2) * cellWidth / int(info['zoom']) / divWidth
+        top = 100.0 * (y + height / 2) * cellWidth / int(info['zoom']) / divHeight
         style = 'left:' + left + '%top:' + top + '%'
         html = '<div class="label" style="' + style + '">'
         if crest.length:
@@ -122,67 +136,58 @@ def updateWithData(data):
         html += '<p class="old uppercase round txt ellipsis">' + name + '</p></div>'
         div.append(html)
 
-    cellWidth = 100.0 * lol.Map.cellWidth / divWidth * zoom / lol.Map.zoom
-    cellHeight = 100.0 * lol.Map.cellWidth / divHeight * zoom / lol.Map.zoom
+    cellWidth = 100.0 * cellWidth / divWidth * int(info['zoom']) / int(info['zoom'])
+    cellHeight = 100.0 * cellWidth / divHeight * int(info['zoom']) / int(info['zoom'])
     unitGroups = data[5].split('$')
-    #div.children('.units').remove()
+
+    print('unitGroups', unitGroups)
     for i in unitGroups:
-        if not unitGroups[i]:
+        if i == "":
             continue
-        units = unitGroups[i].split('|')
+        units = i.split('|')
         x = int(units[0])
         y = int(units[1])
-        n = Math.min(int(units[2]), 9)
-        left = 100.0 * (x - 0.25 + width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
-        top = 100.0 * (y - 0.25 + height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
-        style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
-        html = '<img class="units noMouse" style="' + style + '" src="/img/map/units' + n + '.gif"/>'
-        div.append(html)
+        n = min(int(units[2]), 9)
+        left = 100.0 * (x - 0.25 + width / 2) * cellWidth / int(info['zoom']) / divWidth
+        top = 100.0 * (y - 0.25 + height / 2) * cellWidth / int(info['zoom']) / divHeight
+        style = f'left:{left}%top:{top}%width:{(cellWidth * 1.5)}%height:{(cellHeight * 1.5)}%'
+        html = f'<img class="units noMouse" style="{style}" src="/img/map/units{n}.gif"/>'
+        #div.append(html)
 
     routes = data[6].split('$')
-    #div.children('.route').remove()
+    print('routes', routes)
     for i in routes:
-        if not routes[i]:
+        if i == "":
             continue
         route = routes[i].split('|')
         x = int(route[0])
         y = int(route[1])
         type = route[2]
         title = __('route.' + type)
-        left = 100.0 * (x - 0.25 + width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
-        top = 100.0 * (y - 0.25 + height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
+        left = 100.0 * (x - 0.25 + width / 2) * cellWidth / int(info['zoom']) / divWidth
+        top = 100.0 * (y - 0.25 + height / 2) * cellWidth / int(info['zoom']) / divHeight
         style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
         html = '<img class="route" style="' + style + '" src="/img/map/route.png" title="' + title + '"/>'
         div.append(html)
 
     actions = data[7].split('$')
-    #div.children('.act').remove()
+    print('actions', actions)
     for i in actions:
-        if not actions[i]:
+        if i == "":
             continue
         action = actions[i].split('|')
         x = int(action[0])
         y = int(action[1])
         type = action[2]
         title = __('act.' + type)
-        left = 100.0 * (x - 0.25 + width / 2) * lol.Map.cellWidth / lol.Map.zoom / divWidth
-        top = 100.0 * (y - 0.25 + height / 2) * lol.Map.cellWidth / lol.Map.zoom / divHeight
+        left = 100.0 * (x - 0.25 + width / 2) * cellWidth / int(info['zoom']) / divWidth
+        top = 100.0 * (y - 0.25 + height / 2) * cellWidth / int(info['zoom']) / divHeight
         style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
         html = '<img class="act" style="' + style + '" src="/img/map/act/' + type + '.gif" title="' + title + '"/>'
         div.append(html)
 
-    if anim:
-        pass
-        #div.children('img.new').load(function() {
-        #    $(this).fadeIn(400, function() {
-        #        if ($(this).is('.deprecated')) return
-        #        var key = $(this).attr('data-key')
-        #        div.children('.deprecated[data-key="' + key + '"]').remove()
-        #    })
-        #})
-
-    div.children('img.new').removeClass('new')
-    clearTimeout(lol.Map.deprecatedTimeout)
+    #div.children('img.new').removeClass('new')
+    #clearTimeout(lol.Map.deprecatedTimeout)
     #lol.Map.deprecatedTimeout = setTimeout(function() {
     #    div.children('.deprecated').remove()
     #}, 30000)
