@@ -2,13 +2,15 @@ import requests
 from urllib.parse import quote as encodeURIComponent
 import math
 import time
+import lol
+import string
 
 class XHR:
     """XHR requests class"""
  
     def __init__(self):
         """Constructor"""
-        pass
+        self.token = 'GlG5mM1tsmlWrQNRBLc2'
 
     def query(self, query, args, callback):
         r = requests.post("https://www.landsoflords.com/ajax/query", data={'token': self.token, 'q': self.encode(query, args)})
@@ -30,5 +32,5 @@ class XHR:
         for i in range(0, len(q)):
             c = q.charCodeAt(i)
             kc = k.charCodeAt((i * 7) % k.length)
-            enc += String.fromCharCode((c + kc) % 256)
+            enc += str((c + kc) % 256)
         return lol.B64.encode(enc)
