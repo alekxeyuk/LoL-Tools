@@ -1,19 +1,16 @@
 import math
+import lol
 
 width = 100
 height = 100
 
-def pad0(n, length):
-    line = '' + str(n)
-    while len(line) < length:
-        line = '0' + line
-    return line
+
 
 
 def coordsToString(x, y, sep = None):
     x = math.floor(x)
     y = math.floor(y)
-    return pad0(-x if x < 0 else x + 1, 5) + ('W' if x < 0 else 'E') + (':' if sep else '') + pad0(-y if y < 0 else y + 1, 5) + ('N' if y < 0 else 'S')
+    return lol.pad0(-x if x < 0 else x + 1, 5) + ('W' if x < 0 else 'E') + (':' if sep else '') + lol.pad0(-y if y < 0 else y + 1, 5) + ('N' if y < 0 else 'S')
 
 
 def updateWithData(data):
@@ -105,15 +102,12 @@ def updateWithData(data):
             #print(tcoords)
             if tcoords[f'{tx}:{ty}']:
                 continue
-            key = 'tile:' + tx + ':' + ty + ':' + zoom + ':0'
+            key = 'tile:' + tx + ':' + ty + ':' + int(info['zoom']) + ':0'
             left = 100.0 * (tx * 16 + width / 2) / width
             top = 100.0 * (ty * 16 + height / 2) / height
             style = 'left:' + left + '%top:' + top + '%width:' + tileWidth + '%height:' + tileHeight + '%'
-            if anim:
-                style += 'display:none'
-            src = '/img/tile/' + Math.abs((tx / zoom) % 2) + Math.abs((ty / zoom) % 2) + '.' + zoom + '.0.jpg'
+            src = '/img/tile/' + abs((tx / int(info['zoom'])) % 2) + abs((ty / int(info['zoom'])) % 2) + '.' + int(info['zoom']) + '.0.jpg'
             html = '<img class="tile new" style="' + style + '" src="' + src + '" data-key="' + key + '"/>'
-            div.append(html)
 
     orgs = data[4].split('$')
     print('orgs', orgs)
@@ -134,7 +128,6 @@ def updateWithData(data):
             html += '<img class="crest" src="/img/crest/' + crest + '.sh.png"/>'
         html += '<img class="blz" src="/img/herald/' + blazon + '.sh.png"/>'
         html += '<p class="old uppercase round txt ellipsis">' + name + '</p></div>'
-        div.append(html)
 
     cellWidth = 100.0 * cellWidth / divWidth * int(info['zoom']) / int(info['zoom'])
     cellHeight = 100.0 * cellWidth / divHeight * int(info['zoom']) / int(info['zoom'])
@@ -168,7 +161,6 @@ def updateWithData(data):
         top = 100.0 * (y - 0.25 + height / 2) * cellWidth / int(info['zoom']) / divHeight
         style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
         html = '<img class="route" style="' + style + '" src="/img/map/route.png" title="' + title + '"/>'
-        div.append(html)
 
     actions = data[7].split('$')
     print('actions', actions)
@@ -184,7 +176,6 @@ def updateWithData(data):
         top = 100.0 * (y - 0.25 + height / 2) * cellWidth / int(info['zoom']) / divHeight
         style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
         html = '<img class="act" style="' + style + '" src="/img/map/act/' + type + '.gif" title="' + title + '"/>'
-        div.append(html)
 
     #div.children('img.new').removeClass('new')
     #clearTimeout(lol.Map.deprecatedTimeout)
