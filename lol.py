@@ -1,3 +1,5 @@
+# -*- coding: ISO-8859-1 -*-
+
 import base64
 
 def pad0(n, length):
@@ -12,13 +14,12 @@ class B64:
     def __init__(self):
         self.table = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
     
-    def decode(self, data, url = None):
+    def decode(self, data, url = None, string = False):
         if url:
             data = data.replace('-', '+')
             data = data.replace('~', '/')
             data = data.replace('_', '=')
-        result = str(base64.b64decode(data))[2:-1]
-        return result
+        return base64.b64decode(data) if not string else str(base64.b64decode(data))[2:-1]
 
     def encode(self, data, url = None):
         result = str(base64.b64encode(bytes(data.encode("ISO-8859-1"))))[2:-1]
@@ -27,7 +28,3 @@ class B64:
             result = result.replace('/', '~')
             result = result.replace('=', '_')
         return result
-
-#b6 = B64()
-#print(b6.encode("anal", True))
-#print(b6.decode(b6.encode("anal", True), True))

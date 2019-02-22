@@ -1,5 +1,6 @@
 import math
 import lol
+import requests
 
 width = 100
 height = 100
@@ -91,8 +92,13 @@ def updateWithData(data):
         style = f'left:{left}%top:{top}%width:{tileWidth}%height:{tileHeight}%'
         #if anim:
         #    style += 'display:none'
-        src = f'/img/tile/{ttag}.{info["zoom"]}.{version}{("" if released else ".unreleased")}.jpg'
-        html = '<img class="tile new" style="' + style + '" src="' + src + '" data-key="' + key + '"/>'
+        src = f'https://www.landsoflords.com/img/tile/{ttag}.{info["zoom"]}.{version}{("" if released else ".unreleased")}.jpg'
+        print(src)
+        response = requests.get(src)
+        if response.status_code == 200:
+            with open(f"tiles/{tx}.{ty}.{ttag}.{info['zoom']}.jpg", 'wb') as f:
+                f.write(response.content)
+        #html = '<img class="tile new" style="' + style + '" src="' + src + '" data-key="' + key + '"/>'
         #div.append(html)
         tcoords[f'{tx}:{ty}'] = True
     
@@ -100,14 +106,14 @@ def updateWithData(data):
     for tx in range(int(info['tx0']), int(info['tx0']) + int(info['tw']), int(info["zoom"])):             # (tx = tx0 tx < tx0 + tw tx += zoom)
         for ty in range(int(info['ty0']), int(info['ty0']) + int(info['th']), int(info['zoom'])):         # (ty = ty0 ty < ty0 + th ty += zoom)
             #print(tcoords)
-            if tcoords[f'{tx}:{ty}']:
+            if tcoords.get(f'{tx}:{ty}'):
                 continue
-            key = 'tile:' + tx + ':' + ty + ':' + int(info['zoom']) + ':0'
+            key = f'tile:{tx}:{ty}:{int(info["zoom"])}:0'
             left = 100.0 * (tx * 16 + width / 2) / width
             top = 100.0 * (ty * 16 + height / 2) / height
-            style = 'left:' + left + '%top:' + top + '%width:' + tileWidth + '%height:' + tileHeight + '%'
-            src = '/img/tile/' + abs((tx / int(info['zoom'])) % 2) + abs((ty / int(info['zoom'])) % 2) + '.' + int(info['zoom']) + '.0.jpg'
-            html = '<img class="tile new" style="' + style + '" src="' + src + '" data-key="' + key + '"/>'
+            #style = 'left:' + left + '%top:' + top + '%width:' + tileWidth + '%height:' + tileHeight + '%'
+            #src = '/img/tile/' + abs((tx / int(info['zoom'])) % 2) + abs((ty / int(info['zoom'])) % 2) + '.' + int(info['zoom']) + '.0.jpg'
+            #html = '<img class="tile new" style="' + style + '" src="' + src + '" data-key="' + key + '"/>'
 
     orgs = data[4].split('$')
     print('orgs', orgs)
@@ -152,30 +158,30 @@ def updateWithData(data):
     for i in routes:
         if i == "":
             continue
-        route = routes[i].split('|')
+        route = i.split('|')
         x = int(route[0])
         y = int(route[1])
-        type = route[2]
-        title = __('route.' + type)
+        #type = route[2]
+        #title = __('route.' + type)
         left = 100.0 * (x - 0.25 + width / 2) * cellWidth / int(info['zoom']) / divWidth
         top = 100.0 * (y - 0.25 + height / 2) * cellWidth / int(info['zoom']) / divHeight
-        style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
-        html = '<img class="route" style="' + style + '" src="/img/map/route.png" title="' + title + '"/>'
+        #style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
+        #html = '<img class="route" style="' + style + '" src="/img/map/route.png" title="' + title + '"/>'
 
     actions = data[7].split('$')
     print('actions', actions)
     for i in actions:
         if i == "":
             continue
-        action = actions[i].split('|')
+        action = i.split('|')
         x = int(action[0])
         y = int(action[1])
-        type = action[2]
-        title = __('act.' + type)
+        #type = action[2]
+        #title = __('act.' + type)
         left = 100.0 * (x - 0.25 + width / 2) * cellWidth / int(info['zoom']) / divWidth
         top = 100.0 * (y - 0.25 + height / 2) * cellWidth / int(info['zoom']) / divHeight
-        style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
-        html = '<img class="act" style="' + style + '" src="/img/map/act/' + type + '.gif" title="' + title + '"/>'
+        #style = 'left:' + left + '%top:' + top + '%width:' + (cellWidth * 1.5) + '%height:' + (cellHeight * 1.5) + '%'
+        #html = '<img class="act" style="' + style + '" src="/img/map/act/' + type + '.gif" title="' + title + '"/>'
 
     #div.children('img.new').removeClass('new')
     #clearTimeout(lol.Map.deprecatedTimeout)
