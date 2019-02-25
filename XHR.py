@@ -15,12 +15,15 @@ class XHR:
  
     def __init__(self):
         """Constructor"""
-        self.token = 'jaVdJ5hK4vOSwTn8w8sq'
+        self.token = 'f8bGW6mqpb2wlTwGmTK7'
+
+    def token_update(self, url = None):
+        pass
 
     def query(self, query, args):
-        r = requests.post("https://www.landsoflords.com/ajax/query", data={'token': self.token, 'q': self.encode(query, args)})
-        if r.text[0] == "!":
-            return r.text
+        r = requests.post("https://www.landsoflords.com/ajax/query", data={'token': self.token, 'q': self.encode(query, args)}, cookies={'lang': 'ru', 'PHPSESSID': 'eugs5lct2pvkepuhelpoll5ie1'})
+        if r.text == "" or r.text[0] == "!":
+            return "!eRRor: " + r.text
         return self.decode(r.text)
 
     def decode(self, data):
@@ -63,18 +66,18 @@ class XHR:
 
 XHR = XHR()
 
-for x in range(-476, -800, -1):
-    data = XHR.query('map', {
+#for x in range(-476, -800, -1):
+data = XHR.query('map', {
             'nav': 0,
-            'x': x*16,
-            'y': -14528,
-            'w': 1,
-            'h': 1,
+            'x': 0,
+            'y': 0,
+            'w': 10000,
+            'h': 10000,
             'zoom': 1,
             'mode': 'st'
         })
 
-    if data != "!EXPIRED":
+if data[0] != "!":
         mapdecode.updateWithData(data)
-    else:
+else:
         print(data)

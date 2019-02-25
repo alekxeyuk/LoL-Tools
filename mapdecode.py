@@ -1,6 +1,7 @@
 import math
 import lol
 import requests
+import os
 
 width = 100
 height = 100
@@ -74,7 +75,7 @@ def updateWithData(data):
     #div.children('.tile').addClass('deprecated')
     tileWidth = 100 * int(info['zoom']) * 16 / width
     tileHeight = 100 * int(info['zoom']) * 16 / height
-    print('tiles', tiles)
+    print('tiles', 'tiles', len(tiles))
     for i in tiles:
         if i == "":
             continue
@@ -94,15 +95,16 @@ def updateWithData(data):
         #    style += 'display:none'
         src = f'https://www.landsoflords.com/img/tile/{ttag}.{info["zoom"]}.{version}{("" if released else ".unreleased")}.jpg'
         print(src)
-        response = requests.get(src)
-        if response.status_code == 200:
-            with open(f"tiles/{tx}.{ty}.{ttag}.{info['zoom']}.jpg", 'wb') as f:
-                f.write(response.content)
+        if not os.path.isfile(f"tiles/{tx}.{ty}.{ttag}.{info['zoom']}.jpg"):
+            response = requests.get(src)
+            if response.status_code == 200:
+                with open(f"tiles/{tx}.{ty}.{ttag}.{info['zoom']}.jpg", 'wb') as f:
+                    f.write(response.content)
         #html = '<img class="tile new" style="' + style + '" src="' + src + '" data-key="' + key + '"/>'
         #div.append(html)
         tcoords[f'{tx}:{ty}'] = True
     
-    print('tcoords', tcoords)
+    print('tcoords', 'tcoords', len(tcoords))
     for tx in range(int(info['tx0']), int(info['tx0']) + int(info['tw']), int(info["zoom"])):             # (tx = tx0 tx < tx0 + tw tx += zoom)
         for ty in range(int(info['ty0']), int(info['ty0']) + int(info['th']), int(info['zoom'])):         # (ty = ty0 ty < ty0 + th ty += zoom)
             #print(tcoords)
