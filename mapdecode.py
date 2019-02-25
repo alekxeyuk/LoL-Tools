@@ -86,7 +86,7 @@ def updateWithData(data):
         ty = int(tile[2])
         version = int(tile[3])
         released = int(tile[4])
-        key = f'tile:{tx}:{ty}:{info["zoom"]}:{version}'
+        #key = f'tile:{tx}:{ty}:{info["zoom"]}:{version}'
         left = 100.0 * (tx * 16 + width / 2) / width
         top = 100.0 * (ty * 16 + height / 2) / height
         print(left, top, coordsToString(left, top))
@@ -110,7 +110,7 @@ def updateWithData(data):
             #print(tcoords)
             if tcoords.get(f'{tx}:{ty}'):
                 continue
-            key = f'tile:{tx}:{ty}:{int(info["zoom"])}:0'
+            #key = f'tile:{tx}:{ty}:{int(info["zoom"])}:0'
             left = 100.0 * (tx * 16 + width / 2) / width
             top = 100.0 * (ty * 16 + height / 2) / height
             #style = 'left:' + left + '%top:' + top + '%width:' + tileWidth + '%height:' + tileHeight + '%'
