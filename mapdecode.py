@@ -3,6 +3,8 @@ import lol
 import requests
 import os
 
+requests.packages.urllib3.disable_warnings()
+
 width = 100
 height = 100
 
@@ -96,7 +98,7 @@ def updateWithData(data):
         src = f'https://www.landsoflords.com/img/tile/{ttag}.{info["zoom"]}.{version}{("" if released else ".unreleased")}.jpg'
         print(src)
         if not os.path.isfile(f"tiles/{tx}.{ty}.{ttag}.{info['zoom']}.jpg"):
-            response = requests.get(src)
+            response = requests.get(src, verify=False)
             if response.status_code == 200:
                 with open(f"tiles/{tx}.{ty}.{ttag}.{info['zoom']}.jpg", 'wb') as f:
                     f.write(response.content)
