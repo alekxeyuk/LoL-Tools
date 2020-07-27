@@ -23,10 +23,10 @@ class XHR:
         pass
 
     def query(self, query, args):
-        r = self.session.post("https://www.landsoflords.com/ajax/query", data={'token': self.token, 'q': self.encode(query, args)})
+        r = self.session.post("https://www.landsoflords.com/ajax/query", data={'token': self.token, 'ts': math.floor(time.time()), 'q': self.encode(query, args)})
         if r.text == "" or r.text[0] == "!":
             return "!eRRor: " + r.text
-        return self.decode(r.text)
+        return self.decode_server(r.text)
 
     def _decode(self, data: str, kstring_arg: int = 3) -> str:
         data = data.replace('\n\r', '')
