@@ -22,20 +22,18 @@ class B64:
 
     def __init__(self):
         self.table = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
+        self.decode_table = str.maketrans('-~_', '+/=')
+        self.encode_table = {v: k for k, v in self.decode_table.items()}
     
-    def decode(self, data, url = None, string = False):
+    def decode(self, data: str, url = None, string = False) -> bytes:
         if url:
-            data = data.replace('-', '+')
-            data = data.replace('~', '/')
-            data = data.replace('_', '=')
+            data = data.translate(self.decode_table)
         return base64.b64decode(data) if not string else str(base64.b64decode(data))[2:-1]
 
-    def encode(self, data, url = None):
+    def encode(self, data: str, url = None) -> str:
         result = str(base64.b64encode(bytes(data.encode("ISO-8859-1"))))[2:-1]
         if url:
-            result = result.replace('+', '-')
-            result = result.replace('/', '~')
-            result = result.replace('=', '_')
+            result = result.translate(self.encode_table)
         return result
 
 
