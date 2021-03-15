@@ -13,10 +13,9 @@ locales = {
 }
 
 def pad0(n, length):
-    line = '' + str(n)
-    while len(line) < length:
-        line = '0' + line
-    return line
+    if not isinstance(n, str):
+        n = str(n)
+    return f"{'0'*(length-len(n))}{n}"
 
 class B64:
     """Base 64 encode/decode"""
