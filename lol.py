@@ -12,10 +12,10 @@ locales = {
     'quality.5': "исключительного качества",
 }
 
-def pad0(n, length):
-    if not isinstance(n, str):
-        n = str(n)
-    return n.zfill(length)
+def pad0(data, length: int) -> str:
+    if not isinstance(data, str):
+        n = str(data)
+    return data.zfill(length)
 
 class B64:
     """Base 64 encode/decode"""
