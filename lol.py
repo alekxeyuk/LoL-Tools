@@ -15,7 +15,7 @@ locales = {
 def pad0(n, length):
     if not isinstance(n, str):
         n = str(n)
-    return f"{'0'*(length-len(n))}{n}"
+    return n.zfill(length)
 
 class B64:
     """Base 64 encode/decode"""
