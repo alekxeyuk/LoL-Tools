@@ -1,5 +1,6 @@
 import math
 import base64
+from typing import Union
 
 
 '''# -*- coding: ISO-8859-1 -*-'''
@@ -12,7 +13,7 @@ locales = {
     'quality.5': "исключительного качества",
 }
 
-def pad0(data, length: int) -> str:
+def pad0(data: Union[int, str], length: int) -> str:
     return f"{data:0>{length}}"
 
 class B64:
