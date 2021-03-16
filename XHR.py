@@ -5,7 +5,6 @@ from urllib.parse import quote as encodeURIComponent, unquote as decodeURICompon
 import math
 import time
 import lol
-import string
 import mapdecode
 
 B64 = lol.B64()
