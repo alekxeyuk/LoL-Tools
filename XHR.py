@@ -34,14 +34,10 @@ class XHR:
         ts = int(data[0:4])
         kstring = self.token + str(ts)
         klen = len(kstring)
-        k = ''.join([kstring[(ts + i * kstring_arg) % klen] for i in range(0, 20)])
-        k_len = len(k)
-        result = [
-            chr((ord(char) - ord(k[(i * 7) % k_len])) % 256)
-            for i, char in enumerate(data[4:])
-        ]
 
-        return decodeURIComponent(''.join(result))
+        key = ''.join([kstring[(ts + i * kstring_arg) % klen] for i in range(0, 20)])
+        result = self.cipher(data[4:], key, decode=True)
+        return decodeURIComponent(result)
 
     def decode_client(self, data: str) -> str:
         return self._decode(data, 7)
@@ -61,15 +57,20 @@ class XHR:
         ts = math.floor(math.floor(time.time()) / 9) % 9999
         kstring = self.token + str(ts)
         klen = len(kstring)
-        k = ''
-        for i in range(0, 20):
-            k += kstring[int((ts + i * 7) % klen):int((ts + i * 7) % klen + 1)]
-        k_len = len(k)
-        enc = [lol.pad0(ts, 4)] + [
-            chr((ord(char) + ord(k[(i * 7) % k_len])) % 256)
-            for i, char in enumerate(serialized)
-        ]
+
+        key = ''.join([kstring[int((ts + i * 7) % klen)] for i in range(0, 20)])
+        enc = [lol.pad0(ts, 4), self.cipher(serialized, key)]
         return B64.encode(''.join(enc))
+
+    @staticmethod
+    def cipher(data: str, key: str, decode: bool = False) -> str:
+        key_len = len(key)
+        return ''.join([
+            chr((ord(char) - ord(key[(i * 7) % key_len])) % 256)
+            if decode else
+            chr((ord(char) + ord(key[(i * 7) % key_len])) % 256)
+            for i, char in enumerate(data)
+        ])
 
 if __name__ == "__main__":
     XHR = XHR(input('Enter token'), input('Enter PHPSESSID'))
