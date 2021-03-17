@@ -32,7 +32,7 @@ class XHR:
         data = data.replace('\n\r', '').strip()
         data = B64.decode(data).decode('ISO-8859-1')
         ts = int(data[0:4])
-        kstring = self.token + str(ts)
+        kstring = f"{self.token}{ts}"
         klen = len(kstring)
 
         key = ''.join([kstring[(ts + i * kstring_arg) % klen] for i in range(0, 20)])
@@ -55,7 +55,7 @@ class XHR:
         serialized = ','.join(serialized)
 
         ts = math.floor(math.floor(time.time()) / 9) % 9999
-        kstring = self.token + str(ts)
+        kstring = f"{self.token}{ts}"
         klen = len(kstring)
 
         key = ''.join([kstring[int((ts + i * 7) % klen)] for i in range(0, 20)])
