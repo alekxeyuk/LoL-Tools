@@ -1,5 +1,6 @@
 # -*- coding: ISO-8859-1 -*-
 
+from typing import Union
 import requests
 from urllib.parse import quote as encodeURIComponent, unquote as decodeURIComponent
 import math
@@ -48,24 +49,27 @@ class XHR:
     def decode_server(self, data: str) -> str:
         return self._decode(data, 3)
 
-    def encode(self, query, args):
-        q = ''
-        if args:
-            for i in args.keys():
-                q += i + ':' + encodeURIComponent(bytes(str(args[i]).encode("ISO-8859-1")), safe='~()*!.\'') + ','
-        q += 'query:' + query
+    def encode(self, query: str, args: Union[dict, None] = None) -> str:
+        serialized = [
+            f"""{key}:{encodeURIComponent(str(value).encode("ISO-8859-1"), safe="~()*!.'")}"""
+            for key, value in args.items()
+        ] if args else []
+
+        serialized.append(f'query:{query}')
+        serialized = ','.join(serialized)
+
         ts = math.floor(math.floor(time.time()) / 9) % 9999
         kstring = self.token + str(ts)
         klen = len(kstring)
         k = ''
         for i in range(0, 20):
             k += kstring[int((ts + i * 7) % klen):int((ts + i * 7) % klen + 1)]
-        enc = lol.pad0(ts, 4)
-        for i in range(0, len(q)):
-            c = ord(q[i])
-            kc = ord(k[(i * 7) % len(k)])
-            enc += chr((c + kc) % 256)
-        return B64.encode(enc)
+        k_len = len(k)
+        enc = [lol.pad0(ts, 4)] + [
+            chr((ord(char) + ord(k[(i * 7) % k_len])) % 256)
+            for i, char in enumerate(serialized)
+        ]
+        return B64.encode(''.join(enc))
 
 if __name__ == "__main__":
     XHR = XHR(input('Enter token'), input('Enter PHPSESSID'))
