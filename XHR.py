@@ -59,8 +59,8 @@ class XHR:
         klen = len(kstring)
 
         key = ''.join([kstring[int((ts + i * 7) % klen)] for i in range(0, 20)])
-        enc = [lol.pad0(ts, 4), self.cipher(serialized, key)]
-        return B64.encode(''.join(enc))
+        encoded = f"{lol.pad0(ts, 4)}{self.cipher(serialized, key)}"
+        return B64.encode(encoded)
 
     @staticmethod
     def cipher(data: str, key: str, decode: bool = False) -> str:
