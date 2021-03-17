@@ -28,21 +28,19 @@ class XHR:
         return self.decode_server(r.text)
 
     def _decode(self, data: str, kstring_arg: int = 3) -> str:
-        data = data.replace('\n\r', '')
-        data = data.strip()
+        data = data.replace('\n\r', '').strip()
         data = B64.decode(data).decode('ISO-8859-1')
         ts = int(data[0:4])
         kstring = self.token + str(ts)
         klen = len(kstring)
         k = ''.join([kstring[(ts + i * kstring_arg) % klen] for i in range(0, 20)])
-        result = ''
-        data = data[4:]
-        for i in range(len(data)):
-            c = ord(data[i])
-            kc = ord(k[(i * 7) % len(k)])
-            result += chr((c - kc) % 256)
+        k_len = len(k)
+        result = [
+            chr((ord(char) - ord(k[(i * 7) % k_len])) % 256)
+            for i, char in enumerate(data[4:])
+        ]
 
-        return decodeURIComponent(result)
+        return decodeURIComponent(''.join(result))
 
     def decode_client(self, data: str) -> str:
         return self._decode(data, 7)
